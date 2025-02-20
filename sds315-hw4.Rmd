@@ -1,0 +1,232 @@
+---
+title: "sds315-hw4"
+author: "Minh Nguyen"
+output: html_document
+date: "2025-02-20"
+---
+
+```{r global_options, include=FALSE}
+# The following code is a basic setup of options for your document
+knitr::opts_chunk$set(echo = FALSE, # show the code
+                      eval = TRUE, # run the code
+                      warning = TRUE, # show warning messages
+                      message = FALSE, # show basic messages
+                      fig.align = "center"
+                      )
+```
+
+
+```{r}
+# Load necessary libraries
+library(ggplot2)
+```
+
+```{r}
+#Question 1:
+# Set seed for reproducibility
+set.seed(1234)
+
+# Problem 1: Iron Bank - Monte Carlo Simulation
+
+# Given data
+total_trades <- 2021
+flagged_trades <- 70
+baseline_rate <- 0.024
+num_simulations <- 100000
+
+# Simulate the number of flagged trades under the null hypothesis
+simulated_flags <- rbinom(num_simulations, total_trades, baseline_rate)
+
+# Compute p-value (probability of getting 70 or more flagged trades)
+p_value1 <- mean(simulated_flags >= flagged_trades)
+
+# Plot the simulated distribution
+ggplot(data.frame(simulated_flags), aes(x = simulated_flags)) +
+  geom_histogram(binwidth = 1, fill = "steelblue", color = "black", alpha = 0.7) +
+  geom_vline(xintercept = flagged_trades, color = "red", linetype = "dashed", size = 1.2) +
+  labs(title = "Monte Carlo Simulation: Iron Bank", x = "Number of Flagged Trades", y = "Frequency")
+
+# Print results
+cat("Problem 1 - Iron Bank: p-value =", p_value1, "\n")
+```
+
+```{r} 
+#Question 2:
+# Given data
+total_inspections <- 1500
+gourmet_inspections <- 50
+violations <- 8
+expected_violation_rate <- 0.03
+
+# Simulate the number of violations under the null hypothesis
+simulated_violations <- rbinom(num_simulations, gourmet_inspections, expected_violation_rate)
+
+# Compute p-value (probability of getting 8 or more violations)
+p_value2 <- mean(simulated_violations >= violations)
+
+# Plot the simulated distribution
+ggplot(data.frame(simulated_violations), aes(x = simulated_violations)) +
+  geom_histogram(binwidth = 1, fill = "steelblue", color = "black", alpha = 0.7) +
+  geom_vline(xintercept = violations, color = "red", linetype = "dashed", size = 1.2) +
+  labs(title = "Monte Carlo Simulation: Health Inspections", x = "Number of Violations", y = "Frequency")
+
+# Print results
+cat("Problem 2 - Health Inspections: p-value =", p_value2, "\n")
+```
+
+```{r}
+# Given jury group proportions
+county_population <- c(0.30, 0.25, 0.20, 0.15, 0.10)
+observed_counts <- c(85, 56, 59, 27, 13)
+total_jurors <- sum(observed_counts)
+
+# Expected counts based on county proportions
+expected_counts <- total_jurors * county_population
+
+# Chi-Square Test
+chi_test <- chisq.test(observed_counts, p = county_population)
+
+# Print results
+cat("Problem 3 - Jury Selection: Chi-square statistic =", chi_test$statistic, "p-value =", chi_test$p.value, "\n")
+
+# Plot the Chi-Square Distribution with Observed Test Statistic
+df <- length(county_population) - 1  # Degrees of freedom
+
+# Generate Chi-Square distribution data
+x_values <- seq(0, 20, length.out = 1000)
+y_values <- dchisq(x_values, df = df)
+
+# Create the plot
+ggplot(data.frame(x_values, y_values), aes(x = x_values, y = y_values)) +
+  geom_line(color = "blue", size = 1) +  # Plot Chi-Square distribution
+  geom_vline(xintercept = chi_test$statistic, color = "red", linetype = "dashed", size = 1.2) +  # Mark observed statistic
+  labs(
+    title = "Chi-Square Distribution with Observed Test Statistic",
+    x = "Chi-Square Value",
+    y = "Density"
+  ) +
+  theme_minimal()
+```
+
+```{r}
+#Question 4:
+
+#Part A
+# Load letter frequency CSV
+letter_freq <- read.csv("letter_frequencies.csv", header = TRUE)
+
+# Debug: Print column names
+cat("Column Names in letter_frequencies.csv:\n")
+print(colnames(letter_freq))
+
+# Find the correct frequency column name
+freq_col <- grep("Frequency|frequency|Freq|probability|Prob", colnames(letter_freq), value = TRUE)
+if (length(freq_col) == 0) {
+    stop("Error: No column containing letter frequencies found. Check CSV structure.")
+}
+expected_freq <- letter_freq[[freq_col]]
+
+# Normalize frequencies
+expected_freq <- expected_freq / sum(expected_freq)
+
+# Ensure mapping to letters A-Z
+expected_freq_named <- setNames(expected_freq, LETTERS)
+
+# Debug: Print mapped frequencies
+cat("Mapped Expected Letter Frequencies:\n")
+print(expected_freq_named)
+
+# Load Brown Corpus sentences
+brown_sentences <- readLines("brown_sentences.txt", warn = FALSE)
+
+# Ensure no empty sentences
+brown_sentences <- brown_sentences[nchar(brown_sentences) > 0]
+
+# Function to compute Chi-Square statistic
+compute_chi_squared <- function(sentence, expected_freq_named) {
+  # Convert to uppercase & remove non-letter characters
+  sentence <- toupper(gsub("[^A-Z]", "", sentence))
+  
+  # Skip empty sentences
+  if (nchar(sentence) == 0) {
+    return(NA)
+  }
+  
+  # Get observed letter counts
+  observed_counts <- table(factor(strsplit(sentence, "")[[1]], levels = LETTERS))
+  
+  # Compute expected counts based on sentence length
+  total_letters <- sum(observed_counts)
+  expected_counts <- expected_freq_named * total_letters
+
+  # Prevent zero expected counts (avoid division errors)
+  expected_counts[expected_counts == 0] <- 1e-10
+
+  # Compute Chi-Squared statistic
+  chi_squared_stat <- sum((observed_counts - expected_counts)^2 / expected_counts)
+
+  return(chi_squared_stat)
+}
+
+# Compute chi-squared statistics for Brown Corpus
+chi_squared_null <- sapply(brown_sentences, compute_chi_squared, expected_freq_named)
+
+# Remove NAs
+chi_squared_null <- na.omit(chi_squared_null)
+
+# Debug: Print summary statistics
+cat("Null Distribution Summary:\n")
+print(summary(chi_squared_null))
+
+# Plot histogram of null distribution
+ggplot(data.frame(ChiSquare = chi_squared_null), aes(x = ChiSquare)) +
+  geom_histogram(binwidth = 5, color = "black", fill = "blue", alpha = 0.7) +
+  labs(
+    title = "Null Distribution of Chi-Square Statistics",
+    x = "Chi-Square Statistic",
+    y = "Frequency"
+  ) +
+  theme_minimal()
+```
+
+```{r}
+# Part B: Checking for a Watermark
+# Given test sentences
+test_sentences <- c(
+  "She opened the book and started to read the first chapter, eagerly anticipating what might come next.",
+  "Despite the heavy rain, they decided to go for a long walk in the park, crossing the main avenue by the fountain in the center.",
+  "The museum’s new exhibit features ancient artifacts from various civilizations around the world.",
+  "He carefully examined the document, looking for any clues that might help solve the mystery.",
+  "The students gathered in the auditorium to listen to the guest speaker’s inspiring lecture.",
+  "Feeling vexed after an arduous and zany day at work, she hoped for a peaceful and quiet evening at home, cozying up after a quick dinner with some TV, or maybe a book on her upcoming visit to Auckland.",
+  "The chef demonstrated how to prepare a delicious meal using only locally sourced ingredients, focusing mainly on some excellent dinner recipes from Spain.",
+  "They watched the sunset from the hilltop, marveling at the beautiful array of colors in the sky.",
+  "The committee reviewed the proposal and provided many points of useful feedback to improve the project’s effectiveness.",
+  "Despite the challenges faced during the project, the team worked tirelessly to ensure its successful completion, resulting in a product that exceeded everyone’s expectations."
+)
+
+# Compute chi-squared statistics for test sentences
+chi_squared_test <- sapply(test_sentences, compute_chi_squared, expected_freq_named)
+
+# Debug: Print computed chi-squared values
+cat("Chi-Squared Test Values for Sentences:\n")
+print(chi_squared_test)
+
+# Compute p-values
+p_values <- sapply(chi_squared_test, function(x) mean(chi_squared_null >= x))
+
+# Debug: Print raw p-values
+cat("Raw p-values before rounding:\n")
+print(p_values)
+
+# Print the final results
+p_values_rounded <- round(p_values, 3)
+names(p_values_rounded) <- test_sentences
+
+cat("\nFinal Results - p-values for test sentences:\n")
+print(p_values_rounded)
+
+# Identify the most suspicious sentence
+suspicious_sentence <- which.min(p_values)
+cat("Sentence", suspicious_sentence, "is likely to be watermarked (lowest p-value:", p_values_rounded[suspicious_sentence], ")\n")
+```
