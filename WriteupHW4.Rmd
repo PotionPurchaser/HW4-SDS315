@@ -1,0 +1,265 @@
+---
+title: "WriteUpHW4"
+output: html_document
+date: "2025-02-20"
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+Name: Minh K Nguyen
+
+UT EID: mkn747
+
+[GitHub Repo](https://github.com/PotionPurchaser/HW4-SDS315.git)
+
+# **Problem 1 - Iron Bank**
+
+Null Hypothesis (H₀): The null hypothesis states that the rate at which
+Iron Bank employees’ trades are flagged matches the SEC’s baseline rate
+of 2.4%. In other words, any deviation from this rate is due to random
+variability rather than systematic insider trading.
+
+Test Statistic We use the number of flagged trades out of 2021 total
+trades as our test statistic. Under the null hypothesis, the number of
+flagged trades should follow a binomial distribution: Binomial(n =
+2021,p = 0.024) where:
+
+-   n = 2021 is the total number of trades
+
+-   p= 0.024 is the probability that any given trade is flagged.
+
+Monte Carlo Simulation & Probability Distribution: To assess whether the
+observed number of 70 flagged trades is significantly higher than
+expected:
+
+We perform 100,000 Monte Carlo simulations, each drawing a random sample
+from Bin(2021,0.024)
+
+We generate a probability distribution of flagged trades under the null
+hypothesis. We compute the p-value, which represents the proportion of
+simulations where the number of flagged trades is 70 or more. The
+following plot illustrates the simulated probability distribution of
+flagged trades, assuming the null hypothesis is true:
+
+![](hw4problem1graph.png)
+
+P-Value: The p-value quantifies how likely it is to observe 70 or more
+flagged trades if the null hypothesis were true. From our Monte Carlo
+simulation:
+
+-   p = Proportion of simulations where flagged trades ≥ 70
+
+-   p = = 0.00212
+
+Conclusion: Since the p-value (0.00212) is very small (p \< 0.05
+significance threshold), this suggests that the observed number of
+flagged trades (70) is highly unlikely to occur under the null
+hypothesis. This provides strong evidence against the null hypothesis
+and suggests that Iron Bank employees may be engaging in suspicious
+trading patterns that deviate from normal behavior.
+
+Given this statistical evidence, the SEC has reasonable grounds to
+investigate Iron Bank further for potential insider trading.
+
+# Problem 2 - Health Inspections
+
+Null Hypothesis (H₀): The null hypothesis states that Gourmet Bites
+restaurants are cited for health code violations at the same 3% baseline
+rate as other restaurants in the city. That is, any deviation from this
+rate is due to random variation rather than systematic differences in
+health code compliance.
+
+Test Statistic: We use the number of Gourmet Bites restaurants cited for
+health violations out of 50 total inspections as our test statistic.
+Under the null hypothesis, this should follow a binomial distribution:
+
+Binomial(n=50,p=0.03) where:
+
+-   n=50 is the total number of Gourmet Bites restaurant inspections,
+
+-   p=0.03 is the probability that any given restaurant is cited for a
+    health violation.
+
+Monte Carlo Simulation & Probability Distribution: To determine whether
+the observed number of 8 health violations is significantly higher than
+expected:
+
+We perform 100,000 Monte Carlo simulations, each drawing a random sample
+from Bin(50,0.03). We generate a probability distribution of health
+violations under the null hypothesis. We compute the p-value, which
+represents the proportion of simulations where the number of violations
+is 8 or more. The following plot illustrates the simulated probability
+distribution of health violations, assuming the null hypothesis is true:
+
+![](hw4problem2graph.png)
+
+P-Value: The p-value quantifies how likely it is to observe 8 or more
+health violations if the null hypothesis were true.
+
+From our Monte Carlo simulation:
+
+-   p = Proportion of simulations where violations ≥ 8
+
+-   p = 0.00017
+
+Conclusion: Since the p-value (0.00017) is extremely small, this
+suggests that the observed number of health violations (8) is highly
+unlikely to occur under the null hypothesis. The probability of this
+happening by random chance is less than 0.02%, providing very strong
+evidence against the null hypothesis.
+
+This result suggests that Gourmet Bites restaurants may have a
+significantly higher violation rate than the city’s average. The Health
+Department has strong grounds for further investigation to determine
+whether Gourmet Bites locations have systematic issues with health code
+compliance.
+
+# Problem 3: Evaluating Jury Selection for Bias
+
+Null Hypothesis (H₀): The null hypothesis states that the distribution
+of jurors en-paneled by this judge matches the county’s population
+proportions. In other words, any observed deviations are due to random
+chance rather than systematic bias in jury selection.
+
+Test Statistic: We use the Chi-Square Goodness-of-Fit Test to compare
+the observed jury selection distribution with the expected distribution
+based on the county’s population proportions. The test statistic is: χ²
+= Σ((O - E)² / E)
+
+This test determines whether the observed jury selection is
+significantly different from what would be expected if jurors were
+selected proportionally to the population.
+
+Monte Carlo Simulation & Probability Distribution: To assess whether the
+observed jury selection is significantly different from the expected
+proportions:
+
+We compute the Chi-Square statistic for the observed and expected
+counts. We determine the p-value, which represents the probability of
+obtaining a Chi-Square statistic as extreme as (or more extreme than)
+the observed one, assuming the null hypothesis is true. The following
+plot illustrates the Chi-Square distribution under the null hypothesis,
+with the observed test statistic marked:
+
+![](hw4problem3graph.png)
+
+Results:
+
+-   Chi-square statistic = 12.42639
+-   p = 0.01445
+
+Conclusion Since the p-value (0.01445) is below the 0.05 significance
+threshold, this suggests that the observed jury selection distribution
+is significantly different from the county’s population proportions.
+This provides stronger evidence against the null hypothesis, indicating
+that systematic bias may exist in jury selection.
+
+However, other explanations are possible. The discrepancy might arise
+due to random fluctuations, non-random selection biases (e.g., juror
+availability, exemptions, or procedural factors), or systemic issues
+like misrepresentation due to economic or social factors.
+
+Further Investigation To better understand the cause of this deviation,
+we could:
+
+-   Examine Jury Selection Procedures: Analyze whether juror selection
+    methods disproportionately exclude certain demographic groups.
+
+-   Look at Historical Data: Compare this judge’s jury selection against
+    juries selected by other judges in the same county.
+
+-   Conduct Surveys or Interviews: Gather data on factors affecting
+    juror participation (e.g., financial hardship, difficulty getting
+    excused, or language barriers).
+
+# Problem 4: LLM watermarking
+
+## Part A:
+
+Calculating the Null Distribution Null Hypothesis (H₀): The null
+hypothesis states that each sentence follows the typical English letter
+distribution. Any deviations from this distribution are assumed to be
+due to random variation rather than systematic alterations, such as LLM
+watermarking.
+
+Reference Distribution: We calculated the expected English letter
+frequency distribution from a reference corpus. This distribution serves
+as our null distribution, allowing us to compare each sentence’s letter
+frequencies against expected values.
+
+Building the Null Distribution:
+
+-   A reference Chi-Square distribution was generated using sentences
+    from the Brown Corpus, which follows natural English letter
+    frequency.
+
+-   Chi-Square test statistic was calculated for each sentence in the
+    Brown Corpus:
+
+-   The computed null distribution of the Chi-Square statistic has the
+    following summary:
+
+![](hw4problem4partA.png) ![](hw3problem4partAgraph2.png)
+
+## Part B: 
+
+Null Hypothesis (H₀):
+
+The null hypothesis states that each sentence follows the typical
+English letter distribution. Any deviations from this distribution are
+assumed to be due to random variation rather than systematic
+alterations, such as LLM watermarking.
+
+## **Table of Chi-Square Values & P-Values**
+
+The following table presents the **Chi-Square statistics** and
+**p-values** for each test sentence (rounded to three decimal places):
+
+| **Sentence Index** | **Sentence (Truncated)**                             | **Chi-Square Value** | **p-value** |
+|--------------------|------------------------------------------------------|----------------------|-------------|
+| 1                  | *She opened the book and started...*                 | 14.53274             | 0.650       |
+| 2                  | *Despite the heavy rain, they decided...*            | 22.92813             | 0.466       |
+| 3                  | *The museum’s new exhibit features...*               | 10.33015             | 0.975       |
+| 4                  | *He carefully examined the document...*              | 14.88912             | 0.612       |
+| 5                  | *The students gathered in the auditorium...*         | 10.33015             | 0.975       |
+| 6                  | *Feeling vexed after an arduous and zany day...*     | **39.04543**         | **0.259**   |
+| 7                  | *The chef demonstrated how to prepare...*            | 11.43144             | 0.842       |
+| 8                  | *They watched the sunset from the hilltop...*        | 10.33015             | 0.975       |
+| 9                  | *The committee reviewed the proposal...*             | 10.33015             | 0.975       |
+| 10                 | *Despite the challenges faced during the project...* | 22.92813             | 0.466       |
+
+Identifying the Watermarked Sentence:
+
+The most suspicious sentence is:
+
+Sentence 6: "Feeling vexed after an arduous and zany day at work, she
+hoped for a peaceful and quiet evening at home, cozying up after a quick
+dinner with some TV, or maybe a book on her upcoming visit to Auckland."
+
+Evidences:
+
+-   Sentence 6 has the highest Chi-Square value (39.04543), indicating
+    that its letter frequency significantly deviates from normal
+    English.
+
+-   The p-value for Sentence 6 (0.259) is the lowest, meaning it is the
+    least likely to be naturally generated text.
+
+-   The other sentences have p-values close to 0.5 or higher, suggesting
+    their letter distributions are in line with typical English text.
+
+-   Since Sentence 6 deviates the most, it is the most likely to have
+    been LLM-watermarked by subtly adjusting letter frequencies.
+
+Conclusion:
+
+Since Sentence 6 has the lowest p-value (0.259) and the highest
+Chi-Square statistic (39.04543), we conclude that this sentence was
+produced by an LLM and watermarked by adjusting letter frequencies. The
+statistical evidence strongly suggests that its letter distribution
+deviates from normal English patterns more than any other sentence.
